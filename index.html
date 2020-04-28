@@ -1,0 +1,142 @@
+<html>
+  <head>
+    <title>Form input text-sm-center</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        var datePress = false;
+        var exportDate = "";
+        function printDate(elem, currDateVal) {
+          var current_datetime = new Date();
+          var year = parseInt(current_datetime.getFullYear(), 10);
+
+          var monthDaySet = {
+            "01": 31,
+            "02": 29,
+            "03": 31,
+            "04": 30,
+            "05": 31,
+            "06": 30,
+            "07": 31,
+            "08": 31,
+            "09": 30,
+            "10": 31,
+            "11": 30,
+            "12": 31,
+          };
+
+          var dateOut = "";
+          var dateArray = currDateVal.split("/");
+          var count = 0;
+          var day = "";
+          if (dateArray.length === 1) {
+            if (dateArray[0].length === 2) {
+              if (parseInt(dateArray[0], 10) < 1 && dateArray[0].length === 2) {
+                dateArray[0] = "01";
+              }
+              dateOut = dateArray[0] + " /";
+            } else if (dateArray[0].length > 3) {
+              dateOut = "01 / ";
+            } else {
+              dateOut = dateArray[0];
+            }
+          } else {
+            day = dateArray[0];
+            for (var i = 0; i < dateArray.length; i++) {
+              if (count === 1) {
+                if (dateArray[i].length > 2) {
+                  dateArray[i] = dateArray[i].substring(1, 3);
+                }
+                if (parseInt(dateArray[i], 10) > monthDaySet[day]) {
+                  dateArray[i] = monthDaySet[day];
+                }
+                if (
+                  parseInt(dateArray[i], 10) < 1 &&
+                  dateArray[i].length === 2
+                ) {
+                  dateArray[i] = "01";
+                }
+              } else if (count === 2) {
+                if (parseInt(dateArray[i], 10) > year) {
+                  dateArray[i] = year;
+                }
+              }
+              dateOut = dateOut + dateArray[i];
+              if (count < 2 && dateArray[i].length > 1) {
+                dateOut = dateOut + " / ";
+              }
+              count++;
+              if (count === 3) {
+                break;
+              }
+            }
+          }
+          if (dateOut.length === 14) {
+            var neatdate =
+              dateArray[2] + "-" + dateArray[0] + "-" + dateArray[1];
+            $("#formattedDate").html(neatdate);
+          }
+          elem.val(dateOut);
+        }
+
+        $("#dater").on("keyup keydown keypress", function(e) {
+          if (datePress === false) {
+            datePress = true;
+            var el = $(this);
+
+            setTimeout(function() {
+              datePress = false;
+
+              var dateVal = el.val() + "";
+
+              dateVal = dateVal.replace("-", "/");
+              dateVal = dateVal.replace(
+                /\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\.|\>|\?|\""|\;|\:|\s|[a-zA-Z]/g,
+                ""
+              );
+
+              if (dateVal.length === 1) {
+                if (dateVal[0] === "/") {
+                  dateVal = "01/";
+                }
+                if (parseInt(dateVal[0], 10) > 1) {
+                  dateVal = "0" + dateVal + "/";
+                }
+              } else if (dateVal.length === 2) {
+                if (dateVal === "1/") {
+                  dateVal = "01/";
+                } else if (parseInt(dateVal, 10) > 12) {
+                  dateVal = "12/";
+                }
+              } else if (dateVal.length === 4) {
+                if (dateVal[3] === "/") {
+                  dateVal = dateVal.substring(0, 2) + "/01";
+                } else if (parseInt(dateVal[3], 10) > 3) {
+                  dateVal = dateVal.substring(0, 2) + "/0" + dateVal[3];
+                }
+              } else if (dateVal.length === 5) {
+                if (dateVal[4] === "/") {
+                  dateVal = dateVal.substring(0, 3) + "0" + dateVal[3];
+                }
+              }
+              if (dateVal.length > 10) {
+                dateVal = dateVal.substring(0, 10);
+              }
+
+              if (e.code !== "Backspace" && e.code !== "Delete") {
+                printDate(el, dateVal);
+              }
+            }, 200);
+          }
+        });
+      });
+    </script>
+    <form>
+      <input id="dater" placeholder="MM/DD/YYYY" type="text" />
+      <div id="formattedDate"></div>
+    </form>
+  </body>
+</html>
